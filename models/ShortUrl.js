@@ -1,12 +1,13 @@
 const mongoose  = require("mongoose")
-
+const User = require("./User")
 
 
 const shortUrlSchema = new mongoose.Schema({
       
     userId:{
-        type:"User",
-        ref:mongoose.Types.Schema.ObjectId
+        type:mongoose.Schema.Types.ObjectId,
+        ref:"User",
+        // default:" "
     },
     originalUrl:{
         type:String,
@@ -14,14 +15,14 @@ const shortUrlSchema = new mongoose.Schema({
     },
     ShortURL:{
         type:String,
-        required:true,
+        // required:true,
         default:""
     },
     shortCode:{
         type: String,
-        required: true,
-        unique: true,
-        index: true,
+        // required: true,
+        // unique: true,
+        // index: true,
         default:""
     }
 

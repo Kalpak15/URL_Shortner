@@ -19,8 +19,9 @@ app.get("/api/v1/request",(req,res)=>{
     })
 })
 
-
-app.get("/api/shorturl",)
+const shorturlRoute = require("./routes/shorturlRoute")
+app.use("/api/shorturl",shorturlRoute)
+app.use("/api/store",shorturlRoute)
 
 
 
