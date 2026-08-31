@@ -19,11 +19,11 @@ app.get("/api/v1/request",(req,res)=>{
     })
 })
 
+// Shortcode creation + Redirection
 const shorturlRoute = require("./routes/shorturlRoute")
 app.use("/api/shorturl",shorturlRoute)
 
-
-
+app.use("/api/url",shorturlRoute)
 
 
 app.listen(PORT,()=>console.log("Server is running on port",PORT))

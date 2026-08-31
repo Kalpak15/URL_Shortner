@@ -1,6 +1,6 @@
-var base62 = require("base62/lib/ascii");
+// var base62 = require("base62/lib/ascii");
 const ShortUrl = require("../models/ShortUrl")
-const Counter = require("../models/Counter")
+
 const { randomInt } = require('crypto');
 require("dotenv").config()
 
@@ -14,17 +14,9 @@ const UniqueShortCode = async(req,res)=>{
         
         const url  = req.body.longUrl
         
-        if(!url){
-                return res.status(404).json({
-                success:false,
-                message:"The Orignal URL is Not Found "
-            })
-        }
-        
-
         const URLInfo = await ShortUrl.findOne({originalUrl:url})
         
-        console.log(`The url info is ${URLInfo}`)
+        // console.log(`The url info is ${URLInfo}`)
 
         if(URLInfo!==null){
             
@@ -32,37 +24,75 @@ const UniqueShortCode = async(req,res)=>{
             success:false,
             message:"The URL is already their in DB"
             })
-
+            
         }
-
+        
         BASE62_ALPHABET = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
-         
-        let shortcode = ""
-        let i = 0;
-        while(i<7){
-            const num = randomInt(0,64);
-            shortcode+=BASE62_ALPHABET[num]
-            i++;
+        function func(){
+            
+            let shortcode = "";
+            let i = 0;
+            while(i<7){
+                const num = randomInt(0,62);
+                shortcode+=BASE62_ALPHABET[num]
+                i++;
+            }
+            return shortcode;
         }
-         
+    
+        
+        
+        let code;
+        let shortURL;
 
-                
-        console.log(shortcode)
-        
-        let URl = URL +`/${shortcode}`
-        
-        await ShortUrl.create({originalUrl:url ,ShortURL:URl, shortCode:shortcode});
+        while (true) {
+
+            code = func();
+
+            shortURL = `${URL}/${code}`;
+
+            try {
+
+                await ShortUrl.create({
+                    originalUrl: url,
+                    ShortURL: shortURL,
+                    shortCode: code
+                });
+
+                // Successfully created
+                break;
+
+            } catch (error) {
+
+                // Duplicate shortCode
+                if (error.code === 11000) {
+
+                    console.log(
+                        `Collision detected for ${code}. Generating a new code...`
+                    );
+
+                    continue;
+                }
+
+                // Any other database error
+                throw error;
+            }
+        }
+
+
         
         
         return res.status(200).json({
             success:true,
-            code:shortcode,
-            shortURL: URl,
+            code:code,
+            shortURL: shortURL,
             message:"Successfully created the unique code"
         })
 
     }
     catch(error){
+        console.log(error)
+
         return res.status(500).json({
             success:false,
             message:error.message

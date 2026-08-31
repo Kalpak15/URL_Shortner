@@ -21,11 +21,14 @@ const shortUrlSchema = new mongoose.Schema({
     },
     shortCode:{
         type: String,
+        unique: true,
         // required: true,
-        // unique: true,
         // index: true,
         // default:""
-    }
+    },
+    // {
+
+    // }
 
     
 
