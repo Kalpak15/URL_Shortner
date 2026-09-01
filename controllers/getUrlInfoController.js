@@ -7,8 +7,8 @@ const getAllUrlInfo = async(req,res)=>{
     
         const info = await shortURL.find()
         console.log(info)
-        if(info.size>0){
-            return res.status(404).json({
+        if(info.length>0){
+            return res.status(200).json({
                 success:true,
                 data:info,
                 message:"All url's info"
@@ -38,9 +38,9 @@ const getUrlInfo = async(req,res)=>{
      
     try{
         
-        const url  = req.body.shortcode
-    
-        const info = await shortURL.findOne({originalUrl:url})
+        const {shortcode}  = req.params
+        
+        const info = await shortURL.findOne({shortCode:shortcode})
         
         if(info===null){
             return res.status(404).json({
@@ -50,7 +50,7 @@ const getUrlInfo = async(req,res)=>{
         }
         
         
-        return res.status(404).json({
+        return res.status(200).json({
             success:true,
             data:info,
             message:"The url for shortcode is found"

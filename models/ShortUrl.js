@@ -26,9 +26,10 @@ const shortUrlSchema = new mongoose.Schema({
         // index: true,
         // default:""
     },
-    // {
-
-    // }
+    clickCount:{
+       type:Number,
+       default:0
+    }
 
     
 

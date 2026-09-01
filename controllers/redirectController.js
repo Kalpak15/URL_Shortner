@@ -18,11 +18,22 @@ const RedirectUrl = async(req,res)=>{
             })
         }
         
-        return res.status(200).json({
-            success:true,
-            data:fullInfo,
-            message:"The shortcode info is fetched sucessfully"
-        })
+        // return res.status(200).json({
+        //     success:true,
+        //     data:fullInfo,
+        //     message:"The shortcode info is fetched sucessfully"
+        // })
+        
+        await ShortUrl.findOneAndUpdate(
+            {
+                shortCode:shortcode
+            },
+            {
+                $inc:{clickCount:1}
+            }
+        )
+
+        return res.redirect(fullInfo.originalUrl)
 
     }
     catch(error){
