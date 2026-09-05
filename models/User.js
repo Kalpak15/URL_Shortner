@@ -1,7 +1,7 @@
 const mongoose = require('mongoose')
 
 const userSchema = new mongoose.Schema({
-     
+    
     first_name:{
         type:String,
         required:true
@@ -17,6 +17,12 @@ const userSchema = new mongoose.Schema({
         lowercase: true,
         trim: true,
         match: [/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/, 'Please fill a valid email address']
+    },
+    profilePicture:{
+        type:String
+    },
+    googleId:{
+       type:String
     },
     password:{
         type:String,
