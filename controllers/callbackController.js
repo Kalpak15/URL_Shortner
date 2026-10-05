@@ -12,14 +12,14 @@ const oauth2Client = new google.auth.OAuth2(
 
 const callBackController = async(req,res) =>{
     try{
-        const {state ,code,error} = req.query
+        const {state ,code, error} = req.query
         const storedState = req.session.state;
-
-        if(req.error){
-            console.log(req.error)
+        const isProduction = process.env.NODE_ENV === 'production';
+        if(error){
+            console.log(error)
             return res.status(400).json({
                 success:false,
-                message:req.error
+                message:error
             })
         }
 
@@ -78,12 +78,23 @@ const callBackController = async(req,res) =>{
             let payload = {
                userid:UserInfo._id,
                email:UserInfo.email,
-               name:UserInfo.name,
+               name:UserInfo.first_name,
             }
 
             jsontoken = jwt.sign(payload, secretKey, options)
+            
+            
+            const cookieOption={
+                httpOnly: true, 
+                secure: isProduction,
+                sameSite: 'strict', 
+                path: '/',
+                maxAge: 3600000 
+            };
 
-            return res.status(200).json({
+            return res.status(200)
+            .cookie('auth_token',jsontoken,cookieOption)
+            .json({
                 success:true,
                 data:UserInfo,
                 token:jsontoken
@@ -92,21 +103,43 @@ const callBackController = async(req,res) =>{
         
         else{
             try{
-                const newUser = await User.create({
+                await User.create({
                     googleId: userid,
                     email:email,
-                    name:name,
+                    first_name:name,
                     profilePicture:picture 
                 })
                 
-                console.log("New user created:", newUser);
-
-                return res.status(200).json({
+                 const newUserInfo = await User.findOne({googleId:userid})
+                 
+                 let payload = {
+                    userid:newUserInfo._id,
+                    email:newUserInfo.email,
+                    name:newUserInfo.first_name,
+                }
+                
+                jsontoken = jwt.sign(payload, secretKey, options)
+                
+                
+                console.log("New user created:", newUserInfo);
+                
+                const cookieOption={
+                    httpOnly: true, 
+                    secure: isProduction,
+                    sameSite: 'strict', 
+                    path: '/',
+                    maxAge: 3600000 
+                };
+                
+                return res.status(200)
+                .cookie('auth_token',jsontoken,cookieOption)
+                .json({
                     success:true,
-                    data:newUser,
+                    data:newUserInfo,
                     message:"User is created successfully",
                     token:jsontoken
                 })
+
             }
             catch(error){
                 console.error("Error creating user:", error);

@@ -2,6 +2,9 @@ const express = require('express')
 const app = express()
 var session = require('express-session')
 require('dotenv').config()
+var cookieParser = require('cookie-parser')
+
+app.use(cookieParser()) 
 
 
 const PORT =  process.env.PORT || 3000
@@ -30,14 +33,15 @@ const shorturlRoute = require("./routes/shorturlRoute")
 app.use("/api/shorturl",shorturlRoute)
 
 
-// URL Info Fetching
+// URL Info Fetching and delete info
 const URLInfo = require("./routes/URLinfo")
 app.use("/api/url",URLInfo)
 
 // Login and Signup
 const loginSignup = require("./routes/loginsignup")
-app.use("/api/v1/",loginSignup)
-
+app.use("/api/v1",loginSignup)
+app.use("/api/v1/auth/google",loginSignup)
+// http://localhost:4000/api/v1/auth/google/callback
 
 // session
 
